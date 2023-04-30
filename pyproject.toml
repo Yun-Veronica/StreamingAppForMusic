@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "streamingapp"
+version = "0.1.0"
+description = ""
+authors = ["Yun-Veronica <veronica@yun.kz>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pydentic = "^0.0.1.dev3"
+alembic = "^1.10.4"
+fastapi-pagination = "^0.12.2"
+uvicorn = "^0.22.0"
+pytest = "^7.3.1"
+psycopg2 = "^2.9.6"
+pydantic = {extras = ["email"], version = "^1.10.7"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
