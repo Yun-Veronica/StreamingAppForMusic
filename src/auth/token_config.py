@@ -7,7 +7,7 @@ from os import environ
 # openssl rand -hex 32
 SECRET_KEY = environ.get("SECRET_KEY")
 ALGORITHM = environ.get("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = environ.get("ACCESS_TOKEN_EXPIRE_MINUTES")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(environ.get("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

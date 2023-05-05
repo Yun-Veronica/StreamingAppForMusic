@@ -1,8 +1,11 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 from os import environ
+from dotenv import load_dotenv
 
+load_dotenv() # load environment variables from .env file
 # задаем параметры БД
 DB_USER = environ.get("DB_USER")
 DB_PASSWORD = environ.get("DB_PASSWORD")
@@ -16,8 +19,8 @@ SQLALCHEMY_DATABASE_URL = (
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={}
 )
-
-base = declarative_base()
+metadata=MetaData()
+base = declarative_base(metadata=metadata)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

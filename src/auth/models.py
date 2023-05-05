@@ -13,6 +13,7 @@ class User(base):
     id = Column(Integer, primary_key=True)
     username = Column(String(100), unique=True, index=True)
     email = Column(String(100), unique=True, index=True)
+    password= Column(String(20))
     full_name = Column(String(100))
     hashed_password = Column(String(1000), unique=True, index=True)
     disabled = Column(Boolean)

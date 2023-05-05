@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta
 from typing import Annotated
+from sqlalchemy import literal_column
+from sqlalchemy.exc import SQLAlchemyError
 
 from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 
-import token_config
-from schemas import UserInDB
-from models import User
+from src.auth import token_config
+from src.auth.schemas import UserInDB
+from src.auth.models import User
 from src.database import Session
 
 
@@ -17,15 +19,35 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return token_config.pwd_context.hash(password)
 
+def create_new_user(user: User):
+    with Session() as session:
+        db_user = User(**user.dict())
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+        try:
+            session.commit(db_user)
+            session.refresh(db_user)
+            return db_user
+        except SQLAlchemyError as e:
+            session.rollback()
+            raise HTTPException(status_code=500, detail="Database Error: " + str(e))
+    return db_user
 
+def get_user_username(db, username: str):
+    with db as session:
+        user = session.query(User).filter(User.username == username).first()
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        return UserInDB(**user)
 
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+# TODO CHANGE Session()
+def get_user_id(user_id: int):
+    with Session() as session:
+        user = session.query(User).filter(User.id == user_id).first()
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        return UserInDB(**user)
+def authenticate_user(username: str, password: str):
+    user = get_user_username(username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -44,7 +66,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(token_config.oauth2_scheme)]):
+def get_current_user(token: Annotated[str, Depends(token_config.oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -58,14 +80,16 @@ async def get_current_user(token: Annotated[str, Depends(token_config.oauth2_sch
         token_data = token_config.TokenData(username=username)
     except JWTError:
         raise credentials_exception
+    # TODO CHANGE Session()
+
     with Session() as session:
-        user = get_user(db=session, username=token_data.username)
+        user = get_user_username(db=session,username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
 
-async def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]):
+def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

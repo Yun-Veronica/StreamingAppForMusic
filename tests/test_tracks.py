@@ -1,12 +1,11 @@
 import json
 import pytest
 from fastapi.testclient import TestClient
-
-from src.streaming.router import router
 from src.streaming.schemas import Track, TrackCreate, TrackUpdate, TrackResponse
+from src.main import app
 from src.streaming.models import Track as TrackModel
 
-client = TestClient(router)
+client = TestClient(app)
 
 
 @pytest.fixture(scope="module")

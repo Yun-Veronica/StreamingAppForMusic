@@ -1,17 +1,20 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import List, Optional
+from typing import List
 from src.auth.schemas import User
-# from src.streaming.models import Musician, Genre
+
+
+# from src.streaming.model import Musician, Genre
 
 # =============Musician Schemas=============#
 
 class MusicianBase(BaseModel):
     id: int
-    name: Optional[str] = None
-    genre: Optional[str] = None
-    year_start:  Optional[int] = None
-    year_end:  Optional[int] = None
+    name: str | None = None
+    # genre: str | None = None
+    genre_id: int | None = None
+    year_start: int | None = None
+    year_end: int | None = None
 
 
 class Musician(MusicianBase):
@@ -24,24 +27,25 @@ class Musician(MusicianBase):
 class MusicianUpdate(MusicianBase):
     pass
 
+
 class MusicianCreate(MusicianBase):
     id: int
-    name: Optional[str] = None
-    genre: Optional[str] = None
-    year_start:  Optional[int] = None
-    year_end:  Optional[int] = None
-
+    name: str | None = None
+    genre_id: int | None = None
+    year_start: int | None = None
+    year_end: int | None = None
 
 
 class MusicianResponse(MusicianBase):
-    name: Optional[str] = None
-    genre: Optional[str] = None
-    year_start:  Optional[int] = None
-    year_end:  Optional[int] = None
-
+    id: int | None = None
+    name: str | None = None
+    # genre: str | None = None
+    year_start: int | None = None
+    year_end: int | None = None
 
     class Config:
         orm_mode = True
+
 
 # =============Genre Schemas=============#
 
@@ -53,8 +57,6 @@ class GenreBase(BaseModel):
 class Genre(GenreBase):
     id: int
 
-
-
     class Config:
         orm_mode = True
 
@@ -62,17 +64,14 @@ class Genre(GenreBase):
 class GenreUpdate(GenreBase):
     pass
 
+
 class GenreCreate(GenreBase):
-    id: int
-    musicians: List[Musician] = []
-    title: str | None = None
+    pass
 
 
 class GenreResponse(GenreBase):
     id: int
     title: str | None = None
-    musicians: List[Musician] = []
-
 
     class Config:
         orm_mode = True
@@ -81,24 +80,30 @@ class GenreResponse(GenreBase):
 # =============Track Schemas=============#
 class TrackBase(BaseModel):
     id: int
-    title: Optional[str] = None
-    author: Optional[Musician] = None
-    genre: Optional[Genre] = None
+    title: str | None = None
+    author_id: int | None = None
+    genre_id: int | None = None
     date: date
-    link_to_file: Optional[str] = None
+    link_to_file: str | None = None
 
 
 class Track(TrackBase):
     id: int
-
+    title: str | None = None
+    author_id: int | None = None
+    genre_id: int | None = None
+    date: date
+    link_to_file: str | None = None
     class Config:
         orm_mode = True
 
+
 class TrackCreate(TrackBase):
     title: str
-    author: Optional[Musician] = None
-    genre: Optional[Genre] = None
+    # author: Musician | None = None
+    # genre: Genre | None = None
     link_to_file: str
+
 
 class TrackUpdate(TrackBase):
     pass
@@ -106,27 +111,28 @@ class TrackUpdate(TrackBase):
 
 class TrackResponse(TrackBase):
     id: int
-    title: Optional[str] = None
-    author: Optional[Musician] = None
-    genre: Optional[Genre] = None
+    title: str | None = None
+    # author: Musician | None = None
+    # genre: Genre | None = None
     date: date
 
     class Config:
         orm_mode = True
 
 
-
 # =============Playlist Schemas=============#
 class PlaylistBase(BaseModel):
-    id : int
+    id: int
     name: str
+
 
 class PlaylistCreate(PlaylistBase):
     user_id: int
 
+
 class Playlist(PlaylistBase):
     id: int
-    user: Optional[User] = None
+    user: User | None = None
 
     class Config:
         orm_mode = True

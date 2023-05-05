@@ -16,7 +16,6 @@ from typing import List
 router = APIRouter()
 
 
-
 def create_playlist(playlist: PlaylistCreate):
     with Session() as session:
         db_playlist = PlaylistModel(**playlist.dict())
@@ -37,8 +36,6 @@ def get_playlist(playlist_id: int):
         if db_playlist is None:
             raise HTTPException(status_code=404, detail="Playlist not found")
         return db_playlist
-
-
 
 
 def get_by_tittle(tittle: str):
@@ -85,35 +82,30 @@ def delete_playlist(playlist_id: int):
 
 
 @router.get("/playlists")
-async def get_playlists()-> List[Playlist]:
+async def get_playlists() -> List[Playlist]:
     return get_many_playlists()
 
 
 @router.get("/playlists/{id}")
-async def get_playlist_by_id(playlist_id: id):
+async def get_playlist_by_id(playlist_id: int) -> Playlist:
     return get_playlist(playlist_id)
 
 
-
-
 @router.get("/playlists/search?playlist={playlist_tittle}")
-async def get_playlist_by_tittle(playlist_tittle: str):
+async def get_playlist_by_tittle(playlist_tittle: str) -> Playlist:
     return get_by_tittle(playlist_tittle)
 
 
-
 @router.post("/playlists")
-async def get_playlist_by_id(playlist: PlaylistCreate):
+async def create_playlist_(playlist: PlaylistCreate) -> Playlist:
     return create_playlist(playlist)
 
 
 @router.put("/playlists/{playlist_id}")
-async def update_new_playlist(playlist_id: int, playlist: PlaylistModel):
+async def update_new_playlist(playlist_id: int, playlist: Playlist) -> Playlist:
     return update_playlist(playlist_id, playlist)
 
 
 @router.delete("/playlists/{playlist_id}")
 async def delete_playlist(playlist_id: int):
     return delete_playlist(playlist_id)
-
-

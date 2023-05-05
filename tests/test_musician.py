@@ -42,7 +42,7 @@ def test_get_musician_by_title():
     # create a test musician
     musician = {"name": "John Lennon"}
     session = SessionLocal()
-    db_musician = Musician(**musician.dict())
+    db_musician = Musician(**musician)
     session.add(db_musician)
     session.commit()
     session.refresh(db_musician)
@@ -65,7 +65,7 @@ def test_get_many_musicians():
     ]
     session = SessionLocal()
     for musician in musicians:
-        db_musician = Musician(**musician.dict())
+        db_musician = Musician(**musician)
         session.add(db_musician)
         session.commit()
         session.refresh(db_musician)

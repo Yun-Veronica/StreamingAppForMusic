@@ -3,12 +3,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import timedelta
 from fastapi.testclient import TestClient
+
 from src.main import app
 from src.auth.token_config import ACCESS_TOKEN_EXPIRE_MINUTES
 from src.auth.auth_scripts import create_access_token
+from src.database import SQLALCHEMY_DATABASE_URL
 
-# Replace <database_url> with the actual database URL
-SQLALCHEMY_DATABASE_URL = "<database_url>"
+
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 client = TestClient(app)
 
@@ -23,11 +24,11 @@ def get_testing_db():
         db.close()
 
 
-@pytest.fixture(scope="module")
-def client():
-    app.dependency_overrides[get_testing_db] = get_testing_db
-    client = TestClient(app)
-    yield client
+# @pytest.fixture(scope="module")
+# def client():
+#     app.dependency_overrides[get_testing_db] = get_testing_db
+#     client = TestClient(app)
+#     yield client
 
 
 def test_create_user(client):
