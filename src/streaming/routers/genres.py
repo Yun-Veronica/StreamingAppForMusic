@@ -11,12 +11,12 @@ router = APIRouter()
 
 
 
-def create_genre(genre: GenreCreate):
-    with Session() as session:
+def create_genre(genre: GenreCreate, session):
+    with session:
         db_genre = GenreModel(**genre.dict())
-
         try:
-            session.commit(db_genre)
+            session.add(db_genre)  # Add the db_genre object to the session
+            session.commit()
             session.refresh(db_genre)
             return db_genre
         except SQLAlchemyError as e:
@@ -25,7 +25,7 @@ def create_genre(genre: GenreCreate):
     return db_genre
 
 
-def get_genre(genre_id: int):
+def get_genre(genre_id: int) :
     with Session() as session:
         db_genre = session.query(GenreModel).filter(GenreModel.id == genre_id).first()
         if db_genre is None:
@@ -40,14 +40,16 @@ def get_many_genres():
         return db_genre
 
 
-def update_genre(genre_id: int, genre: GenreModel):
-    with Session() as session:
+def update_genre(genre_id: int, genre: GenreModel, session):
+    with session:
         db_genre = session.query(GenreModel).filter(GenreModel.id == genre_id).first()
         if db_genre is None:
             raise HTTPException(status_code=404, detail="Genre not found")
-        for field, value in genre:
-            setattr(db_genre, field, value)
+        db_genre.title = genre.title
+        # for field, value in genre:
+        #     setattr(db_genre, field, value)
         try:
+            session.add(db_genre)
             session.commit()
             session.refresh(db_genre)
             return db_genre
@@ -75,22 +77,22 @@ async def get_genres()-> List[Genre]:
 
 
 @router.get("/genres/{id}")
-async def get_genre_by_id(genre_id: id)->Genre:
-    return get_genre(genre_id)
-
-
+async def get_genre_by_id(genre_id: int)->GenreResponse:
+   return get_genre(genre_id)
 
 
 @router.post("/genres")
-async def create_genre(genre: GenreCreate)->Genre:
-    return create_genre(genre)
+async def create_genre_(genre: GenreCreate) -> Genre:
+    with Session() as session:
+        return create_genre(genre, session)
 
 
 @router.put("/genres/{genre_id}")
-async def update_genre(genre_id: int, genre: Genre)->Genre:
-    return update_genre(genre_id, genre)
+async def update_genre_(genre_id: int, genre: Genre) ->Genre:
+    with Session() as session:
+        return update_genre(genre_id, genre, session)
 
 
 @router.delete("/genres/{genre_id}")
-async def delete_genre(genre_id: int):
+async def delete_genre_(genre_id: int):
     return delete_genre(genre_id)

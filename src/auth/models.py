@@ -14,6 +14,7 @@ class User(base):
     username = Column(String(100), unique=True, index=True)
     email = Column(String(100), unique=True, index=True)
     full_name = Column(String(100))
+    password= Column(String(20))
     hashed_password = Column(String(1000), unique=True, index=True)
     disabled = Column(Boolean)
     playlists = relationship("Playlist", back_populates="user")

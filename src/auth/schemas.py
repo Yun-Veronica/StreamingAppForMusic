@@ -2,12 +2,13 @@ from typing import Optional, List
 from pydantic import BaseModel, EmailStr
 
 class UserBase(BaseModel):
-    id: Optional[int]
+    id: int
     username: str
     email: EmailStr
-    full_name: Optional[str] = None
-    hashed_password: str
-    disabled: Optional[bool] = False
+    password: str | None = None
+    full_name: str | None = None
+    hashed_password: str | None = None
+    disabled: bool | None = False
 
 
     class Config:
@@ -15,7 +16,8 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
+    id: int
+    password: str | None = None
     username: str
 
 
@@ -32,15 +34,22 @@ class UserUpdate(UserBase):
 
 
 class UserInDB(UserBase):
-    hashed_password: str
+    id: int
+    username: str
+    email: EmailStr
+    full_name: str | None = None
+    password: str | None = None
+    hashed_password: str | None = None
+    disabled: bool | None = False
+
 
 
 class UserResponse(UserBase):
-    id: Optional[int]
+    id: int
     username: str
     email: EmailStr
-    full_name: Optional[str] = None
-    disabled: Optional[bool] = False
+    full_name: str | None = None
+    disabled: bool | None = False
 
 
     class Config:
