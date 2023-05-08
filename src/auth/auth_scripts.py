@@ -18,26 +18,37 @@ def verify_password(plain_password, hashed_password):
 
 def get_password_hash(password):
     return token_config.pwd_context.hash(password)
+#TODO DELETE
 
-def create_new_user(user: User):
-    with Session() as session:
-        db_user = User(**user.dict())
+# def create_new_user(user: User):
+#     with Session() as session:
+#         db_user = User(**user.dict())
+#
+#         try:
+#             session.add(db_user)
+#             session.commit()
+#             session.refresh(db_user)
+#             return db_user
+#         except SQLAlchemyError as e:
+#             session.rollback()
+#             raise HTTPException(status_code=500, detail="Database Error: " + str(e))
+#     return db_user
 
-        try:
-            session.commit(db_user)
-            session.refresh(db_user)
-            return db_user
-        except SQLAlchemyError as e:
-            session.rollback()
-            raise HTTPException(status_code=500, detail="Database Error: " + str(e))
-    return db_user
-
-def get_user_username(db, username: str):
-    with db as session:
+def get_user_username(session, username: str):
+    with session:
         user = session.query(User).filter(User.username == username).first()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        return UserInDB(**user)
+        # return UserInDB(**user)
+        return user
+def get_user_username_(session, username: str):
+    with session:
+        user_db = session.query(User).filter(User.username == username).first()
+        if user_db is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        return user_db
+
 
 # TODO CHANGE Session()
 def get_user_id(user_id: int):
@@ -46,8 +57,8 @@ def get_user_id(user_id: int):
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
         return UserInDB(**user)
-def authenticate_user(username: str, password: str):
-    user = get_user_username(username)
+def authenticate_user(db,username: str, password: str):
+    user = get_user_username_(session=db,username=username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -66,7 +77,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-def get_current_user(token: Annotated[str, Depends(token_config.oauth2_scheme)]):
+def get_current_user(session,token: Annotated[str, Depends(token_config.oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -83,7 +94,7 @@ def get_current_user(token: Annotated[str, Depends(token_config.oauth2_scheme)])
     # TODO CHANGE Session()
 
     with Session() as session:
-        user = get_user_username(db=session,username=token_data.username)
+        user = get_user_username(session=session,username=token_data.username)
     if user is None:
         raise credentials_exception
     return user

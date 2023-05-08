@@ -124,15 +124,17 @@ class TrackResponse(TrackBase):
 class PlaylistBase(BaseModel):
     id: int
     name: str
+    user_id: int
 
 
 class PlaylistCreate(PlaylistBase):
-    user_id: int
+    pass
 
 
 class Playlist(PlaylistBase):
     id: int
-    user: User | None = None
+    name: str
+    user_id: int
 
     class Config:
         orm_mode = True

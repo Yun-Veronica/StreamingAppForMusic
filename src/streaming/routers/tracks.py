@@ -86,17 +86,17 @@ async def get_tracks()->list:
     with Session() as session:
         return get_many_tracks(session)
 
+@router.get("/tracks/search?track={track_tittle}")
+async def get_tracks_by_tittle(track_tittle: str)->list:
+    with Session() as session:
+        return get_by_tittle(track_tittle,session)
+
 
 @router.get("/tracks/{id}")
 async def get_track_by_id(track_id: int)->Track:
     with Session() as session:
         return get_track(track_id,session)
 
-
-@router.get("/tracks/search?track={track_tittle}")
-async def get_tracks_by_tittle(track_tittle: str)->list:
-    with Session() as session:
-        return get_by_tittle(track_tittle,session)
 
 
 @router.get("/tracks/search?query={query}")

@@ -15,7 +15,7 @@ def create_musician(musician: MusicianCreate, session):
     with session:
         musician_dict = musician.dict()
         db_musician = MusicianModel(id=musician_dict['id'],
-                                    name=musician_dict['name'],
+                                    name=musician_dict['name'].lower(),
                                     year_start=musician_dict['year_start'],
                                     genre_id=musician_dict['genre_id'],
                                     year_end=musician_dict['year_end']
@@ -42,9 +42,10 @@ def get_musician(musician_id: int, session):
 
 def get_by_tittle(tittle: str, session):
     with session:
-        db_musician = session.query(MusicianModel).filter(MusicianModel.name.like(f'%{tittle}%')).first()
+        db_musician = session.query(MusicianModel).filter(MusicianModel.name.like(f'%{tittle.lower()}%')).all()
         if db_musician is None:
             raise HTTPException(status_code=404, detail="Musician not found")
+
         return db_musician
 
 
@@ -91,16 +92,16 @@ async def get_musicians() -> list:
         return get_many_musicians(session)
 
 
+@router.get("/musicians/search-by-tittle")
+async def get_musicians_by_tittle(musician_tittle: str) -> list:
+    with Session() as session:
+        return get_by_tittle(musician_tittle, session)
+
+
 @router.get("/musicians/{id}")
 async def get_musician_by_id(musician_id: int) -> Musician:
     with Session() as session:
         return get_musician(musician_id, session)
-
-
-@router.get("/musicians/search?musician={musician_tittle}")
-async def get_musicians_by_tittle(musician_tittle: str) -> list:
-    with Session() as session:
-        return get_by_tittle(musician_tittle, session)
 
 
 @router.post("/musicians")

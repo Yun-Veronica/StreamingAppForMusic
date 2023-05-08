@@ -5,8 +5,8 @@ class UserBase(BaseModel):
     id: int
     username: str
     email: EmailStr
-    full_name: str | None = None
     password: str | None = None
+    full_name: str | None = None
     hashed_password: str | None = None
     disabled: bool | None = False
 
